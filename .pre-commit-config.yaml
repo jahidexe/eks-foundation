@@ -3,37 +3,36 @@ repos:
     rev: v1.99.0  # Latest as of Apr 2025
     hooks:
       - id: terraform_fmt
-        stages: [commit]
+        stages: [pre-commit]
       - id: terraform_validate
-        stages: [commit]
+        stages: [pre-commit]
       - id: terraform_tflint
-        stages: [commit]
-        additional_dependencies: ["tflint==0.50.3"]  # Pin to latest stable
+        stages: [pre-commit]
       - id: terraform_docs
         args: ["--output-file", "README.md", "--output-mode", "inject"]
-        stages: [commit]
+        stages: [pre-commit]
 
   - repo: https://github.com/bridgecrewio/checkov
     rev: 3.2.416
     hooks:
       - id: checkov
         args: ["--quiet", "--compact", "--framework", "terraform"]
-        stages: [commit]
+        stages: [pre-commit]
 
   - repo: https://github.com/pre-commit/pre-commit-hooks
     rev: v4.4.0
     hooks:
       - id: end-of-file-fixer
-        stages: [commit]
+        stages: [pre-commit]
       - id: trailing-whitespace
-        stages: [commit]
+        stages: [pre-commit]
         exclude: ".*\\.md$"  # skip markdown files
       - id: detect-private-key
-        stages: [commit]
+        stages: [pre-commit]
 
   - repo: https://github.com/bridgecrewio/checkov
     rev: 3.2.416
     hooks:
       - id: checkov_secrets
         args: ["--quiet"]
-        stages: [commit]
+        stages: [pre-commit]

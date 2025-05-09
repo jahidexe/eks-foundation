@@ -11,11 +11,11 @@ locals {
 
   # Simple resource names
   names = {
-    vpc           = "${local.prefix}-vpc"
-    public_subnet = "${local.prefix}-public-subnet"
+    vpc            = "${local.prefix}-vpc"
+    public_subnet  = "${local.prefix}-public-subnet"
     private_subnet = "${local.prefix}-private-subnet"
-    igw           = "${local.prefix}-igw"
-    route_table   = "${local.prefix}-rt"
+    igw            = "${local.prefix}-igw"
+    route_table    = "${local.prefix}-rt"
   }
 
   # Conditional dependencies for VPC Flow Logs
@@ -28,11 +28,9 @@ locals {
       aws_s3_bucket.vpc_flow_logs[0]
     ] : []
   )
-} 
+}
 
 resource "aws_flow_log" "this" {
   # ... other configuration ...
   depends_on = local.flow_log_dependencies
-} 
-
-
+}

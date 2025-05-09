@@ -29,8 +29,8 @@ variable "public_subnets" {
 variable "private_subnets" {
   description = "List of private subnet configurations"
   type = list(object({
-    cidr_block = string  # The IPv4 CIDR block for the subnet
-    az         = string  # The Availability Zone for the subnet
+    cidr_block = string # The IPv4 CIDR block for the subnet
+    az         = string # The Availability Zone for the subnet
   }))
 }
 

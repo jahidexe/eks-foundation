@@ -3,7 +3,7 @@ module "vpc" {
 
   # Required variables
   vpc_cidr = "10.0.0.0/16"
-  
+
   # Subnet configurations
   public_subnets = [
     {
@@ -28,8 +28,8 @@ module "vpc" {
   ]
 
   # NAT Gateway configuration
-  enable_nat_gateway   = true
-  single_nat_gateway   = true
+  enable_nat_gateway = true
+  single_nat_gateway = true
 
   # Subnet IP configuration
   map_public_ip_on_launch_public_subnets  = false
@@ -41,8 +41,8 @@ module "vpc" {
   enable_s3_logging         = false
 
   # S3 bucket configuration
-  s3_bucket_force_destroy         = false
-  s3_bucket_versioning           = false
+  s3_bucket_force_destroy          = false
+  s3_bucket_versioning             = false
   s3_bucket_server_side_encryption = false
 
   # Common tags
