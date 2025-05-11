@@ -48,6 +48,19 @@ variable "private_subnet_cidrs" {
   default     = ["10.0.10.0/24", "10.0.11.0/24"]
 }
 
+# API Endpoint Access Configuration
+variable "endpoint_public_access" {
+  description = "Whether the Amazon EKS public API server endpoint is enabled"
+  type        = bool
+  default     = true
+}
+
+variable "public_access_cidrs" {
+  description = "List of CIDR blocks that can access the Amazon EKS public API server endpoint"
+  type        = list(string)
+  default     = ["81.99.182.203/32"] # Restricted to specific IP address
+}
+
 # Node Group Configuration
 variable "node_group_instance_types" {
   description = "List of instance types for the node group"

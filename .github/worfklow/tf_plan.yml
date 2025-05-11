@@ -1,0 +1,48 @@
+name: Terraform CI
+
+on:
+  push:
+    branches: [main, dev]
+    # Support any feature branch like feature/my-new-feature
+    branches-ignore: []
+  pull_request:
+    branches: [main, dev, 'feature-*']
+
+jobs:
+  terraform:
+    name: Terraform Format, Validate, Lint, Plan
+    runs-on: ubuntu-latest
+
+    defaults:
+      run:
+        shell: bash
+        working-directory: ./terraform  # adjust this if your Terraform lives elsewhere
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: 1.6.6
+
+      - name: Install TFLint
+        uses: terraform-linters/setup-tflint@v4
+        with:
+          tflint_version: latest
+
+      - name: Terraform Format Check
+        run: terraform fmt -check -recursive
+
+      - name: Terraform Init
+        run: terraform init -input=false
+
+      - name: Terraform Validate
+        run: terraform validate
+
+      - name: Run TFLint
+        run: tflint --init && tflint
+
+      - name: Terraform Plan
+        run: terraform plan -no-color

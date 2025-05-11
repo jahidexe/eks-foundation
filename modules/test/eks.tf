@@ -12,6 +12,10 @@ module "eks" {
   vpc_cidr             = module.vpc.vpc_cidr
   private_subnet_cidrs = module.vpc.private_subnet_cidrs
 
+  # API Endpoint Access
+  endpoint_public_access = true
+  public_access_cidrs    = ["81.99.182.203/32"] # Restricted to specific IP address
+
   # Node Group Configuration
   node_group_instance_types = var.node_group_instance_types
   node_group_desired_size   = var.node_group_desired_size
