@@ -55,10 +55,16 @@ variable "endpoint_public_access" {
   default     = true
 }
 
+variable "endpoint_private_access" {
+  description = "Whether the Amazon EKS private API server endpoint is enabled"
+  type        = bool
+  default     = true
+}
+
 variable "public_access_cidrs" {
   description = "List of CIDR blocks that can access the Amazon EKS public API server endpoint"
   type        = list(string)
-  default     = ["81.99.182.203/32"] # Restricted to specific IP address
+  default     = ["81.99.182.203/32"] # Better to specify your corporate CIDR range
 }
 
 # Node Group Configuration
@@ -219,4 +225,23 @@ variable "public_subnet_cidrs" {
   description = "List of CIDR blocks for public subnets"
   type        = list(string)
   default     = ["10.0.1.0/24", "10.0.2.0/24"]
+}
+
+# Add new variables for encryption and security
+variable "kms_key_arn" {
+  description = "ARN of the KMS key used for encrypting EKS secrets"
+  type        = string
+  default     = null # Will create a new KMS key if not specified
+}
+
+variable "flow_logs_retention_in_days" {
+  description = "Number of days to retain VPC flow logs"
+  type        = number
+  default     = 14
+}
+
+variable "flow_logs_traffic_type" {
+  description = "Type of traffic to capture in VPC flow logs (ACCEPT, REJECT, or ALL)"
+  type        = string
+  default     = "ALL"
 }

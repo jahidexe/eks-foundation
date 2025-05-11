@@ -12,9 +12,10 @@ module "eks" {
   vpc_cidr             = module.vpc.vpc_cidr
   private_subnet_cidrs = module.vpc.private_subnet_cidrs
 
-  # API Endpoint Access
-  endpoint_public_access = true
-  public_access_cidrs    = ["81.99.182.203/32"] # Restricted to specific IP address
+  # API Endpoint Access - Improved security by setting endpoint_private_access to true
+  endpoint_public_access  = var.endpoint_public_access
+  endpoint_private_access = true
+  public_access_cidrs     = var.public_access_cidrs
 
   # Node Group Configuration
   node_group_instance_types = var.node_group_instance_types
@@ -41,10 +42,12 @@ module "eks" {
   # Access Management
   manage_aws_auth = var.manage_aws_auth
 
-  # Admin users - hardcoded for simplicity
-  eks_admin_users = [
-    "arn:aws:iam::509399620336:user/jahid_boss"
-  ]
+  # Admin users - use variable instead of hardcoded value
+  eks_admin_users = var.eks_admin_users
+
+  # Enable encryption for EKS secrets with KMS
+  enable_secrets_encryption = true
+  kms_key_arn               = var.kms_key_arn
 
   # Tags
   tags = var.tags
