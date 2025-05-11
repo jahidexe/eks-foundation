@@ -1,55 +1,47 @@
+# Simple VPC module for testing
+# In a real scenario, you would use the AWS VPC module or a custom VPC module
+
 module "vpc" {
   source = "../vpc"
 
   # Required variables
-  vpc_cidr = "10.0.0.0/16"
+  vpc_cidr     = var.vpc_cidr
+  project_name = var.project_name
+  owner        = var.owner
+  environment  = var.environment
+  cluster_name = var.cluster_name
 
-  # Subnet configurations
+  # Define public_subnets and private_subnets as required by the module
   public_subnets = [
-    {
-      cidr_block = "10.0.1.0/24"
-      az         = "us-west-2a"
-    },
-    {
-      cidr_block = "10.0.2.0/24"
-      az         = "us-west-2b"
+    for i, cidr in var.public_subnet_cidrs : {
+      cidr_block = cidr
+      az         = var.availability_zones[i]
     }
   ]
 
   private_subnets = [
-    {
-      cidr_block = "10.0.3.0/24"
-      az         = "us-west-2a"
-    },
-    {
-      cidr_block = "10.0.4.0/24"
-      az         = "us-west-2b"
+    for i, cidr in var.private_subnet_cidrs : {
+      cidr_block = cidr
+      az         = var.availability_zones[i]
     }
   ]
 
-  # NAT Gateway configuration
-  enable_nat_gateway = true
-  single_nat_gateway = true
+  # These are still needed for the module's internal logic
+  public_subnet_cidrs  = var.public_subnet_cidrs
+  private_subnet_cidrs = var.private_subnet_cidrs
+  availability_zones   = var.availability_zones
 
-  # Subnet IP configuration
+  # Optional configuration with defaults
+  enable_nat_gateway = true
+  single_nat_gateway = true # Use single NAT for cost savings
+
+  # Security settings
   map_public_ip_on_launch_public_subnets  = false
   map_public_ip_on_launch_private_subnets = false
 
-  # VPC Flow Logs configuration
-  enable_vpc_flow_logs      = false
-  enable_cloudwatch_logging = false
-  enable_s3_logging         = false
+  # Flow logs - disabled for test environment
+  enable_vpc_flow_logs = false
 
-  # S3 bucket configuration
-  s3_bucket_force_destroy          = false
-  s3_bucket_versioning             = false
-  s3_bucket_server_side_encryption = false
-
-  # Common tags
-  common_tags = {
-    Environment = "test"
-    Project     = "eks-test"
-    Terraform   = "true"
-    Owner       = "DevOps"
-  }
+  # Pass through tags
+  tags = var.tags
 }

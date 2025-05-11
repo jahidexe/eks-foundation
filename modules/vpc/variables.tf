@@ -13,6 +13,12 @@ variable "owner" {
   type        = string
 }
 
+variable "tags" {
+  description = "A map of tags to add to all resources"
+  type        = map(string)
+  default     = {}
+}
+
 variable "vpc_cidr" {
   description = "CIDR block for VPC"
   type        = string
@@ -88,26 +94,39 @@ variable "s3_bucket_force_destroy" {
   default     = false
 }
 
-variable "s3_bucket_versioning" {
-  description = "Enable versioning for the S3 bucket"
-  type        = bool
-  default     = true
-}
-
-variable "s3_bucket_server_side_encryption" {
-  description = "Enable server-side encryption for the S3 bucket"
-  type        = bool
-  default     = true
-}
-
 variable "map_public_ip_on_launch_public_subnets" {
-  description = "Auto-assign public IP on launch for public subnets"
+  description = "Auto-assign public IP on launch for public subnets. Set to false for better security, allowing explicit control over which instances get public IPs"
   type        = bool
-  default     = true
+  default     = false
 }
 
 variable "map_public_ip_on_launch_private_subnets" {
   description = "Auto-assign public IP on launch for private subnets"
   type        = bool
   default     = false
+}
+
+# Add these variables to support our test module
+variable "cluster_name" {
+  description = "Name of the EKS cluster"
+  type        = string
+  default     = "eks-cluster"
+}
+
+variable "public_subnet_cidrs" {
+  description = "List of CIDR blocks for public subnets"
+  type        = list(string)
+  default     = []
+}
+
+variable "private_subnet_cidrs" {
+  description = "List of CIDR blocks for private subnets"
+  type        = list(string)
+  default     = []
+}
+
+variable "availability_zones" {
+  description = "List of availability zones"
+  type        = list(string)
+  default     = []
 }
