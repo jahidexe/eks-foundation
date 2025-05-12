@@ -3,10 +3,14 @@ name: Terraform CI
 on:
   push:
     branches: [main, dev]
-    # Support any feature branch like feature/my-new-feature
-    branches-ignore: []
+    paths:
+      - 'terraform/modules/**/*.tf'
+      - '.github/workflows/**'
   pull_request:
     branches: [main, dev, 'feature-*']
+    paths:
+      - 'terraform/modules/**/*.tf'
+      - '.github/workflows/**'
 
 jobs:
   terraform:
@@ -16,7 +20,7 @@ jobs:
     defaults:
       run:
         shell: bash
-        working-directory: ./terraform  # adjust this if your Terraform lives elsewhere
+        working-directory: ./terraform/modules/test  # or 'eks', 'vpc' if needed
 
     steps:
       - name: Checkout code
