@@ -143,4 +143,31 @@ Example:
 - KMS key alias: `alias/eks-foundation-dev-terraform-key`
 - Access logs bucket: `eks-foundation-dev-access-logs`
 - Second-tier logs bucket: `eks-foundation-dev-log-bucket-logs`
-- Third-tier meta logs bucket: `eks-foundation-dev-meta-logs` 
+- Third-tier meta logs bucket: `eks-foundation-dev-meta-logs`
+
+## GitHub Actions Setup
+
+This repository contains GitHub Actions workflows for automated testing, planning, and applying of Terraform configurations. To set up GitHub Actions with remote state management, follow these steps:
+
+1. Create an S3 bucket for Terraform state storage
+2. Configure the following repository secrets in your GitHub repository settings:
+   - `JAHID_GITHUB_CI_ACCESS_KEY_ID`: AWS Access Key ID with permissions to access S3 and create resources
+   - `JAHID_GITHUB_CI_SECRET_KEY_ID`: AWS Secret Access Key
+   - `TF_STATE_BUCKET`: Name of the S3 bucket for Terraform state (e.g., "myproject-terraform-state")
+   - `TF_API_TOKEN`: Terraform Cloud API token (if using Terraform Cloud)
+
+3. Update `backend.tf` to use the S3 backend:
+   ```hcl
+   terraform {
+     backend "s3" {
+       bucket       = "your-terraform-state-bucket"  # Will be overridden by GitHub Actions
+       key          = "terraform.tfstate"
+       region       = "eu-west-1"
+       encrypt      = true
+       kms_key_id   = "arn:aws:kms:eu-west-1:ACCOUNT_ID:key/KEY_ID"  # Optional
+       use_lockfile = true  # For Terraform >= 1.6.x
+     }
+   }
+   ```
+
+4. Update the GitHub Actions workflow in `.github/workflows/test_terraform.yml` to use the S3 backend configuration with the repository secrets. 

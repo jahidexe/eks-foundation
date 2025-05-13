@@ -45,18 +45,11 @@ jobs:
       with:
         cli_config_credentials_token: ${{ secrets.TF_API_TOKEN }}
 
+
     # Initialize a new or existing Terraform working directory by creating initial files, loading any remote state, downloading modules, etc.
-    # Required secrets for S3 backend:
-    # - TF_STATE_BUCKET: Name of the S3 bucket for Terraform state
-    # - TF_LOCK_TABLE: Name of the DynamoDB table for state locking
     - name: Terraform Init
-      run: |
-        terraform init \
-          -backend-config="bucket=${{ secrets.TF_STATE_BUCKET }}" \
-          -backend-config="key=terraform.tfstate" \
-          -backend-config="region=eu-west-1" \
-          -backend-config="use_lockfile=true" \
-          -backend-config="encrypt=true"
+      run: terraform init
+
 
     # Checks that all Terraform configuration files adhere to a canonical format
     - name: Terraform Format
