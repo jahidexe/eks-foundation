@@ -28,23 +28,40 @@ data "aws_iam_policy_document" "eks_kms_policy" {
       "kms:Encrypt",
       "kms:Decrypt",
       "kms:DescribeKey",
-      "kms:GenerateDataKey*",
-      "kms:ReEncrypt*"
+      "kms:GenerateDataKey",
+      "kms:GenerateDataKeyWithoutPlaintext",
+      "kms:ReEncrypt",
+      "kms:ReEncryptFrom",
+      "kms:ReEncryptTo"
     ]
     resources = [aws_kms_key.eks.arn]
   }
 }
 
 data "aws_iam_policy_document" "eks_cloudwatch_policy" {
+  # Separate statement for CreateLogGroup with specific resource
   statement {
     effect = "Allow"
     actions = [
-      "logs:CreateLogGroup",
+      "logs:CreateLogGroup"
+    ]
+    resources = [
+      "arn:aws:logs:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:log-group:/aws/eks/${var.cluster_name}"
+    ]
+  }
+  
+  # Separate statement for other actions that can use more specific resource patterns
+  statement {
+    effect = "Allow"
+    actions = [
       "logs:CreateLogStream",
       "logs:PutLogEvents",
       "logs:DescribeLogStreams"
     ]
-    resources = ["arn:aws:logs:*:*:log-group:/aws/eks/${var.cluster_name}/*"]
+    resources = [
+      "arn:aws:logs:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:log-group:/aws/eks/${var.cluster_name}:*",
+      "arn:aws:logs:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:log-group:/aws/eks/${var.cluster_name}:log-stream:*"
+    ]
   }
 }
 

@@ -1,7 +1,7 @@
 variable "aws_region" {
   description = "AWS region"
   type        = string
-  default     = "us-east-1"
+  default     = "eu-west-2"
 }
 
 variable "cluster_name" {
@@ -52,7 +52,7 @@ variable "private_subnet_cidrs" {
 variable "endpoint_public_access" {
   description = "Whether the Amazon EKS public API server endpoint is enabled"
   type        = bool
-  default     = true
+  default     = false # Disabled by default for security
 }
 
 variable "endpoint_private_access" {
@@ -62,9 +62,9 @@ variable "endpoint_private_access" {
 }
 
 variable "public_access_cidrs" {
-  description = "List of CIDR blocks that can access the Amazon EKS public API server endpoint"
+  description = "List of CIDR blocks that can access the Amazon EKS public API server endpoint when public access is enabled"
   type        = list(string)
-  default     = ["81.99.182.203/32"] # Better to specify your corporate CIDR range
+  default     = [] # Empty list by default, specify your corporate CIDR range if needed
 }
 
 # Node Group Configuration
@@ -218,7 +218,7 @@ variable "project_name" {
 variable "availability_zones" {
   description = "List of availability zones"
   type        = list(string)
-  default     = ["us-east-1a", "us-east-1b"]
+  default     = ["eu-west-2a", "eu-west-2b"]
 }
 
 variable "public_subnet_cidrs" {

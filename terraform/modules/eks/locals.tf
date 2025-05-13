@@ -117,7 +117,7 @@ EOT
         from_port   = 53
         to_port     = 53
         protocol    = "udp"
-        cidr_blocks = ["0.0.0.0/0"]
+        cidr_blocks = [var.vpc_cidr]
       }
     ],
     cluster_ingress = [
@@ -138,18 +138,18 @@ EOT
         source_security_group_id = "cluster"
       },
       {
-        description = "Allow DNS outbound traffic"
+        description = "Allow DNS outbound traffic within VPC"
         from_port   = 53
         to_port     = 53
         protocol    = "udp"
-        cidr_blocks = ["0.0.0.0/0"]
+        cidr_blocks = [var.vpc_cidr]
       },
       {
-        description = "Allow NTP outbound traffic"
+        description = "Allow NTP outbound traffic to AWS Time Sync service"
         from_port   = 123
         to_port     = 123
         protocol    = "udp"
-        cidr_blocks = ["0.0.0.0/0"]
+        cidr_blocks = ["169.254.169.123/32"]
       },
       {
         description = "Allow node-to-node communication"
@@ -159,11 +159,21 @@ EOT
         self        = true
       },
       {
-        description = "Allow HTTPS outbound traffic for package updates"
+        description = "Allow HTTPS outbound traffic to private subnets for package updates"
         from_port   = 443
         to_port     = 443
         protocol    = "tcp"
-        cidr_blocks = ["0.0.0.0/0"]
+        cidr_blocks = var.private_subnet_cidrs
+      },
+      {
+        description = "Allow HTTPS outbound traffic to AWS API endpoints"
+        from_port   = 443
+        to_port     = 443
+        protocol    = "tcp"
+        cidr_blocks = concat(
+          ["169.254.169.254/32"],  # EC2 metadata service
+          [for s in var.private_subnet_cidrs : s]  # VPC endpoints in private subnets
+        )
       }
     ],
     node_ingress = [

@@ -58,7 +58,6 @@ output "node_group_iam_role_name" {
 output "aws_auth_config_map" {
   description = "The aws-auth ConfigMap for cluster access"
   value       = var.manage_aws_auth ? kubernetes_config_map_v1.aws_auth[0].data : null
-  depends_on  = [kubernetes_config_map_v1.aws_auth]
   sensitive   = true
 }
 

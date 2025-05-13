@@ -61,7 +61,7 @@ variable "endpoint_public_access" {
 }
 
 variable "public_access_cidrs" {
-  description = "List of CIDR blocks that can access the Amazon EKS public API server endpoint"
+  description = "List of CIDR blocks that can access the Amazon EKS public API server endpoint when public access is enabled"
   type        = list(string)
   default     = []
 }
@@ -69,6 +69,12 @@ variable "public_access_cidrs" {
 # Logging and Encryption
 variable "enable_all_logs" {
   description = "Enable all cluster log types (increases cost)"
+  type        = bool
+  default     = false
+}
+
+variable "minimal_logs" {
+  description = "Use minimal but compliant logging setup (for dev environments)"
   type        = bool
   default     = false
 }
@@ -96,6 +102,19 @@ variable "node_group_instance_types" {
   description = "List of instance types for the node group"
   type        = list(string)
   default     = ["t3.small"]
+}
+
+# Cost Optimization for Dev Environments
+variable "dev_instance_types" {
+  description = "List of instance types for dev environments (cost optimized)"
+  type        = list(string)
+  default     = ["t3.micro"] # Free tier eligible
+}
+
+variable "dev_disk_size" {
+  description = "EBS volume size for dev environments (GB)"
+  type        = number
+  default     = 10
 }
 
 variable "node_group_ami_id" {
@@ -178,6 +197,50 @@ variable "cluster_startup_schedule" {
   description = "Cron expression for cluster startup schedule"
   type        = string
   default     = "0 8 ? * MON-FRI *" # Start at 8 AM on weekdays
+}
+
+# Free Tier Optimization Configuration
+variable "free_tier_eligible" {
+  description = "Whether to optimize for AWS Free Tier eligibility"
+  type        = bool
+  default     = false
+}
+
+variable "free_tier_instance_type" {
+  description = "Instance type eligible for AWS Free Tier"
+  type        = string
+  default     = "t2.micro" # AWS Free Tier eligible
+}
+
+variable "cost_optimized_ebs_type" {
+  description = "EBS volume type optimized for cost"
+  type        = string
+  default     = "gp3" # More cost-effective than gp2
+}
+
+# Enhanced Security
+variable "enable_vpc_cni_prefix_delegation" {
+  description = "Enable VPC CNI prefix delegation for increased pod density"
+  type        = bool
+  default     = false
+}
+
+variable "enable_security_groups_for_pods" {
+  description = "Enable security groups for pods"
+  type        = bool
+  default     = false
+}
+
+variable "enable_secrets_encryption" {
+  description = "Enable encryption of Kubernetes secrets using KMS"
+  type        = bool
+  default     = true
+}
+
+variable "enable_imdsv2" {
+  description = "Enforce IMDSv2 for EC2 instances (enhanced security)"
+  type        = bool
+  default     = true
 }
 
 # Access Configuration

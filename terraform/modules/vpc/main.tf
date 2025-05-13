@@ -31,6 +31,9 @@ resource "aws_vpc" "this" {
 resource "aws_default_security_group" "this" {
   vpc_id = aws_vpc.this.id
 
+  # Explicitly define rules to ensure compliance with security best practices
+  # Deny all ingress and egress by default - explicit rules should be created as needed
+  
   tags = merge(local.common_tags, {
     Name = "${local.names.vpc}-default-sg"
   })
@@ -149,22 +152,78 @@ resource "aws_route" "public_internet_gateway" {
 # Get current AWS account ID
 data "aws_caller_identity" "current" {}
 
+# Get current AWS region
+data "aws_region" "current" {}
+
 # CloudWatch Log Group for VPC Flow Logs
 resource "aws_cloudwatch_log_group" "vpc_flow_logs" {
-  count             = var.enable_vpc_flow_logs && var.enable_cloudwatch_logging ? 1 : 0
-  name              = coalesce(var.log_group_name, "${local.names.vpc}-flow-logs")
-  retention_in_days = 30
-  kms_key_id        = var.kms_key_id
+  name              = "/aws/vpc/flow-logs/${local.names.vpc}"
+  retention_in_days = var.flow_logs_retention_days
+  kms_key_id        = var.use_kms_encryption ? aws_kms_key.logs[0].arn : null
 
   tags = merge(local.common_tags, {
     Name = "${local.names.vpc}-flow-logs"
   })
 }
 
-# IAM Role for VPC Flow Logs
+# KMS Key for encrypting the logs (optional)
+resource "aws_kms_key" "logs" {
+  count                   = var.use_kms_encryption ? 1 : 0
+  description             = "KMS key for encrypting VPC flow logs"
+  deletion_window_in_days = 7
+  enable_key_rotation     = true
+
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Sid    = "Enable IAM User Permissions"
+        Effect = "Allow"
+        Principal = {
+          AWS = "arn:aws:iam::${data.aws_caller_identity.current.account_id}:root"
+        }
+        Action = [
+          "kms:Create*",
+          "kms:Describe*",
+          "kms:Enable*",
+          "kms:List*",
+          "kms:Put*",
+          "kms:Update*",
+          "kms:Revoke*",
+          "kms:Disable*",
+          "kms:Get*",
+          "kms:Delete*",
+          "kms:ScheduleKeyDeletion",
+          "kms:CancelKeyDeletion"
+        ]
+        Resource = "*"
+      },
+      {
+        Sid    = "Allow CloudWatch Logs to use the key"
+        Effect = "Allow"
+        Principal = {
+          Service = "logs.${data.aws_region.current.name}.amazonaws.com"
+        }
+        Action = [
+          "kms:Encrypt*",
+          "kms:Decrypt*",
+          "kms:ReEncrypt*",
+          "kms:GenerateDataKey*",
+          "kms:Describe*"
+        ]
+        Resource = "*"
+      }
+    ]
+  })
+
+  tags = merge(local.common_tags, {
+    Name = "${local.names.vpc}-flow-logs-key"
+  })
+}
+
+# IAM Role for Flow Logs
 resource "aws_iam_role" "vpc_flow_logs" {
-  count = var.enable_vpc_flow_logs && var.enable_cloudwatch_logging ? 1 : 0
-  name  = "${local.names.vpc}-flow-logs-role"
+  name = "${local.names.vpc}-flow-logs-role"
 
   assume_role_policy = jsonencode({
     Version = "2012-10-17"
@@ -184,49 +243,42 @@ resource "aws_iam_role" "vpc_flow_logs" {
   })
 }
 
-# IAM Role Policy for VPC Flow Logs
+# IAM Policy for Flow Logs
 resource "aws_iam_role_policy" "vpc_flow_logs" {
-  count = var.enable_vpc_flow_logs && var.enable_cloudwatch_logging ? 1 : 0
-  name  = "${local.names.vpc}-flow-logs-policy"
-  role  = aws_iam_role.vpc_flow_logs[0].id
+  name = "${local.names.vpc}-flow-logs-policy"
+  role = aws_iam_role.vpc_flow_logs.id
 
   policy = jsonencode({
     Version = "2012-10-17"
     Statement = [
       {
-        Effect = "Allow"
         Action = [
           "logs:CreateLogStream",
-          "logs:PutLogEvents",
+          "logs:PutLogEvents"
+        ],
+        Effect   = "Allow"
+        Resource = "${aws_cloudwatch_log_group.vpc_flow_logs.arn}:*"
+      },
+      {
+        Action = [
           "logs:DescribeLogGroups",
           "logs:DescribeLogStreams"
-        ]
-        Resource = [
-          aws_cloudwatch_log_group.vpc_flow_logs[0].arn,
-          "${aws_cloudwatch_log_group.vpc_flow_logs[0].arn}:*"
-        ]
+        ],
+        Effect   = "Allow"
+        Resource = "arn:aws:logs:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:log-group:*"
       }
     ]
   })
 }
 
 # VPC Flow Logs
-resource "aws_flow_log" "this" {
-  count                    = var.enable_vpc_flow_logs ? 1 : 0
-  iam_role_arn             = var.enable_cloudwatch_logging ? aws_iam_role.vpc_flow_logs[0].arn : null
-  log_destination          = var.enable_cloudwatch_logging ? aws_cloudwatch_log_group.vpc_flow_logs[0].arn : (var.enable_s3_logging ? aws_s3_bucket.vpc_flow_logs[0].arn : null)
-  log_destination_type     = var.enable_cloudwatch_logging ? "cloud-watch-logs" : (var.enable_s3_logging ? "s3" : null)
-  traffic_type             = "ALL"
-  vpc_id                   = aws_vpc.this.id
-  max_aggregation_interval = 60
+resource "aws_flow_log" "vpc_flow_logs" {
+  iam_role_arn    = aws_iam_role.vpc_flow_logs.arn
+  log_destination = aws_cloudwatch_log_group.vpc_flow_logs.arn
+  traffic_type    = "ALL"
+  vpc_id          = aws_vpc.this.id
 
   tags = merge(local.common_tags, {
     Name = "${local.names.vpc}-flow-logs"
   })
-
-  depends_on = [
-    aws_cloudwatch_log_group.vpc_flow_logs,
-    aws_iam_role.vpc_flow_logs,
-    aws_s3_bucket.vpc_flow_logs
-  ]
 }

@@ -6,7 +6,7 @@ module "vpc" {
 
   # Required variables
   vpc_cidr     = var.vpc_cidr
-  project_name = var.project_name
+  project      = var.project_name
   owner        = var.owner
   environment  = var.environment
   cluster_name = var.cluster_name
@@ -40,9 +40,9 @@ module "vpc" {
   map_public_ip_on_launch_private_subnets = false
 
   # Flow logs - enable for security
-  enable_vpc_flow_logs        = true
-  flow_logs_retention_in_days = 14
-  flow_logs_traffic_type      = "ALL"
+  enable_vpc_flow_logs      = true
+  flow_logs_retention_days  = 14
+  flow_logs_traffic_type    = "ALL"
 
   # Pass through tags
   tags = var.tags

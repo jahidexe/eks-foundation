@@ -1,10 +1,11 @@
 variable "environment" {
-  description = "Environment name (e.g., dev, staging, prod)"
+  description = "Environment name for tagging and resource naming"
   type        = string
+  default     = "dev"
 }
 
-variable "project_name" {
-  description = "Name of the project"
+variable "project" {
+  description = "Project name for tagging and resource naming"
   type        = string
 }
 
@@ -14,13 +15,13 @@ variable "owner" {
 }
 
 variable "tags" {
-  description = "A map of tags to add to all resources"
+  description = "Additional tags to apply to resources"
   type        = map(string)
   default     = {}
 }
 
 variable "vpc_cidr" {
-  description = "CIDR block for VPC"
+  description = "CIDR block for the VPC"
   type        = string
 }
 
@@ -56,6 +57,28 @@ variable "enable_vpc_flow_logs" {
   description = "Enable VPC Flow Logs"
   type        = bool
   default     = false
+}
+
+variable "flow_logs_retention_days" {
+  description = "Number of days to retain VPC flow logs in CloudWatch"
+  type        = number
+  default     = 14
+}
+
+variable "use_kms_encryption" {
+  description = "Whether to use KMS encryption for VPC flow logs"
+  type        = bool
+  default     = true
+}
+
+variable "flow_logs_traffic_type" {
+  description = "Type of traffic to capture in VPC Flow Logs"
+  type        = string
+  default     = "REJECT"
+  validation {
+    condition     = contains(["ACCEPT", "REJECT", "ALL"], var.flow_logs_traffic_type)
+    error_message = "Traffic type must be one of: ACCEPT, REJECT, ALL"
+  }
 }
 
 variable "enable_cloudwatch_logging" {

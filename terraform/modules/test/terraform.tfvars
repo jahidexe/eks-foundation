@@ -3,6 +3,12 @@ cluster_name    = "eks-foundation"
 cluster_version = "1.29"
 environment     = "dev"
 
+# API Endpoint Access - Secure by default
+endpoint_public_access  = false
+endpoint_private_access = true
+# If public access is needed, uncomment and specify your corporate CIDR range
+# public_access_cidrs = ["YOUR_CORPORATE_CIDR"]
+
 # Project Information
 project_name = "eks-foundation"
 owner        = "jahid"
@@ -11,7 +17,7 @@ owner        = "jahid"
 vpc_cidr             = "10.0.0.0/16"
 public_subnet_cidrs  = ["10.0.1.0/24", "10.0.2.0/24"]
 private_subnet_cidrs = ["10.0.10.0/24", "10.0.11.0/24"]
-availability_zones   = ["us-east-1a", "us-east-1b"]
+availability_zones   = ["eu-west-1a", "eu-west-1b"]
 
 # Node Group Configuration
 node_group_instance_types = ["t3.small"]
@@ -33,4 +39,10 @@ tags = {
   ManagedBy   = "Terraform"
   Environment = "dev"
   Owner       = "jahid"
-} 
+}
+
+aws_region = "eu-west-1"
+
+# You can add other variable overrides here
+# For example:
+# cluster_name = "eks-foundation-london" 

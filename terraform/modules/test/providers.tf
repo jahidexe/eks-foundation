@@ -11,25 +11,40 @@ terraform {
   }
 }
 
+# Configure the AWS Provider
 provider "aws" {
   region = var.aws_region
+  default_tags {
+    tags = {
+      Environment = var.environment
+      Project     = var.project_name
+      ManagedBy   = "Terraform"
+    }
+  }
 }
 
-# IMPORTANT: In an actual deployment, this provider would be configured in a separate
-# apply step after the EKS cluster is created.
-# For the initial deployment, set manage_aws_auth = false in terraform.tfvars
+# For the initial deployment, the Kubernetes provider is not required
+# After cluster creation, uncomment this and set manage_aws_auth = true in terraform.tfvars
+# 
+# provider "kubernetes" {
+#   host                   = data.aws_eks_cluster.this[0].endpoint
+#   cluster_ca_certificate = base64decode(data.aws_eks_cluster.this[0].certificate_authority[0].data)
+#   exec {
+#     api_version = "client.authentication.k8s.io/v1beta1"
+#     args        = ["eks", "get-token", "--cluster-name", var.cluster_name]
+#     command     = "aws"
+#   }
+# }
+# 
+# data "aws_eks_cluster" "this" {
+#   count = var.manage_aws_auth ? 1 : 0
+#   name  = var.cluster_name
+#   depends_on = [
+#     module.eks
+#   ]
+# }
 
-# The Kubernetes provider configuration below is purposely structured to:
-# 1. Load conditionally using var.manage_aws_auth to prevent startup errors
-# 2. Skip host/cert/token validation when not actually connecting
-provider "kubernetes" {
-  # Only configure when manage_aws_auth = true
-  host = "https://localhost"
-
-  # Skip authentication checks for initial setup
-  insecure = true
-}
-
-# Note: We're avoiding any data sources that could cause dependency cycles
-# Use the update_k8s_provider.sh script after the cluster is created to
-# properly configure this provider with actual cluster credentials
+# Note: After the cluster is created, you can run:
+# 1. Set manage_aws_auth = true in terraform.tfvars
+# 2. Uncomment the provider "kubernetes" block above
+# 3. Run terraform apply again

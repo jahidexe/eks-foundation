@@ -1,4 +1,6 @@
 # Configure EKS access with aws-auth ConfigMap
+# This resource will only be created during the second apply after the cluster exists
+# and manage_aws_auth = true
 resource "kubernetes_config_map_v1" "aws_auth" {
   count = var.manage_aws_auth ? 1 : 0
 

@@ -1,11 +1,11 @@
 locals {
   # Basic prefix for all resource names
-  prefix = "${var.project_name}-${var.environment}"
+  prefix = "${var.project}-${var.environment}"
 
   # Simple tags that should be applied to all resources
   common_tags = merge({
     Environment = var.environment
-    Project     = var.project_name
+    Project     = var.project
     Owner       = var.owner
     Terraform   = "true"
   }, var.tags)
@@ -13,6 +13,7 @@ locals {
   # Simple resource names
   names = {
     vpc                 = "${local.prefix}-vpc"
+    vpc_flow_logs       = "${local.prefix}-vpc-flow-logs"
     public_subnet       = "${local.prefix}-public-subnet"
     private_subnet      = "${local.prefix}-private-subnet"
     igw                 = "${local.prefix}-igw"

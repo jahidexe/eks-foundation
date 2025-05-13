@@ -15,7 +15,20 @@ resource "aws_kms_key" "eks" {
         Principal = {
           AWS = "arn:aws:iam::${data.aws_caller_identity.current.account_id}:root"
         }
-        Action   = "kms:*"
+        Action = [
+          "kms:Create*",
+          "kms:Describe*",
+          "kms:Enable*",
+          "kms:List*",
+          "kms:Put*",
+          "kms:Update*",
+          "kms:Revoke*",
+          "kms:Disable*",
+          "kms:Get*",
+          "kms:Delete*",
+          "kms:ScheduleKeyDeletion",
+          "kms:CancelKeyDeletion"
+        ]
         Resource = "*"
       },
       {
@@ -28,8 +41,11 @@ resource "aws_kms_key" "eks" {
           "kms:Encrypt",
           "kms:Decrypt",
           "kms:DescribeKey",
-          "kms:GenerateDataKey*",
-          "kms:ReEncrypt*"
+          "kms:GenerateDataKey",
+          "kms:GenerateDataKeyWithoutPlaintext",
+          "kms:ReEncrypt",
+          "kms:ReEncryptFrom",
+          "kms:ReEncryptTo"
         ]
         Resource = "*"
       },
@@ -42,7 +58,8 @@ resource "aws_kms_key" "eks" {
         Action = [
           "kms:Decrypt",
           "kms:DescribeKey",
-          "kms:GenerateDataKey*"
+          "kms:GenerateDataKey",
+          "kms:GenerateDataKeyWithoutPlaintext"
         ]
         Resource = "*"
       }

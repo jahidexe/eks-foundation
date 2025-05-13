@@ -45,10 +45,6 @@ module "eks" {
   # Admin users - use variable instead of hardcoded value
   eks_admin_users = var.eks_admin_users
 
-  # Enable encryption for EKS secrets with KMS
-  enable_secrets_encryption = true
-  kms_key_arn               = var.kms_key_arn
-
   # Tags
   tags = var.tags
 }
