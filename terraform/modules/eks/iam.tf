@@ -49,7 +49,7 @@ data "aws_iam_policy_document" "eks_cloudwatch_policy" {
       "arn:aws:logs:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:log-group:/aws/eks/${var.cluster_name}"
     ]
   }
-  
+
   # Separate statement for other actions that can use more specific resource patterns
   statement {
     effect = "Allow"

@@ -12,7 +12,7 @@ resource "aws_eks_cluster" "this" {
     ] : var.environment == "dev" && var.minimal_logs ? [
     "api",
     "audit",
-    "authenticator", 
+    "authenticator",
     ] : [
     "api",
     "audit",
@@ -103,14 +103,14 @@ resource "null_resource" "free_tier_warning" {
 resource "aws_eks_addon" "vpc_cni" {
   cluster_name = aws_eks_cluster.this.name
   addon_name   = "vpc-cni"
-  
+
   configuration_values = var.enable_vpc_cni_prefix_delegation ? jsonencode({
     env = {
       ENABLE_PREFIX_DELEGATION = "true"
       WARM_PREFIX_TARGET       = "1"
     }
   }) : null
-  
+
   tags = merge(local.common_tags, {
     "eks-addon" = "vpc-cni"
   })
@@ -119,7 +119,7 @@ resource "aws_eks_addon" "vpc_cni" {
 resource "aws_eks_addon" "coredns" {
   cluster_name = aws_eks_cluster.this.name
   addon_name   = "coredns"
-  
+
   tags = merge(local.common_tags, {
     "eks-addon" = "coredns"
   })
@@ -128,7 +128,7 @@ resource "aws_eks_addon" "coredns" {
 resource "aws_eks_addon" "kube_proxy" {
   cluster_name = aws_eks_cluster.this.name
   addon_name   = "kube-proxy"
-  
+
   tags = merge(local.common_tags, {
     "eks-addon" = "kube-proxy"
   })

@@ -171,8 +171,8 @@ EOT
         to_port     = 443
         protocol    = "tcp"
         cidr_blocks = concat(
-          ["169.254.169.254/32"],  # EC2 metadata service
-          [for s in var.private_subnet_cidrs : s]  # VPC endpoints in private subnets
+          ["169.254.169.254/32"],                 # EC2 metadata service
+          [for s in var.private_subnet_cidrs : s] # VPC endpoints in private subnets
         )
       }
     ],

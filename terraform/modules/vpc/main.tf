@@ -33,7 +33,7 @@ resource "aws_default_security_group" "this" {
 
   # Explicitly define rules to ensure compliance with security best practices
   # Deny all ingress and egress by default - explicit rules should be created as needed
-  
+
   tags = merge(local.common_tags, {
     Name = "${local.names.vpc}-default-sg"
   })

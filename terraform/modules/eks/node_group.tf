@@ -31,8 +31,8 @@ resource "aws_eks_node_group" "this" {
 
 # Launch Template for EKS Node Group
 resource "aws_launch_template" "eks_node_group" {
-  name_prefix   = "${var.cluster_name}-node-group-"
-  image_id      = var.node_group_ami_id
+  name_prefix = "${var.cluster_name}-node-group-"
+  image_id    = var.node_group_ami_id
   instance_type = var.environment == "dev" ? (
     length(var.dev_instance_types) > 0 ? var.dev_instance_types[0] : var.node_group_instance_types[0]
   ) : var.node_group_instance_types[0]
@@ -75,7 +75,7 @@ resource "aws_launch_template" "eks_node_group" {
   monitoring {
     enabled = var.environment == "prod" ? true : false
   }
-  
+
   lifecycle {
     create_before_destroy = true
   }
@@ -87,7 +87,7 @@ resource "aws_autoscaling_policy" "cluster_autoscaling" {
   name                   = "${var.cluster_name}-node-autoscaling-policy"
   autoscaling_group_name = aws_eks_node_group.this.resources[0].autoscaling_groups[0].name
   policy_type            = "TargetTrackingScaling"
-  
+
   target_tracking_configuration {
     predefined_metric_specification {
       predefined_metric_type = "ASGAverageCPUUtilization"
