@@ -4,12 +4,12 @@ on:
   push:
     branches: ["master"]
     paths:
-      - 'terraform/modules/**/*.tf'
+      - 'terraform/modules/test/**/*.tf'
       - '.github/workflows/**'
   pull_request:
     branches: ["master", "dev", "feature-*"]
     paths:
-      - 'terraform/modules/**/*.tf'
+      - 'terraform/modules/test/**/*.tf'
       - '.github/workflows/**'
       
 permissions:
@@ -24,8 +24,8 @@ jobs:
     defaults:
       run:
         shell: bash
-        # Set the working directory for all run steps
-        working-directory: ./terraform
+        # Set the working directory specifically to the test module
+        working-directory: ./terraform/modules/test
 
     steps:
     # Checkout the repository to the GitHub Actions runner
