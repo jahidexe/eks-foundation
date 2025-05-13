@@ -1,14 +1,17 @@
-name: Terraform
+name: Terraform CI
 
 on:
   push:
-    branches: [ "master" ]
+    branches: ["master"]
     paths:
-      - 'terraform/**'
+      - 'terraform/modules/**/*.tf'
+      - '.github/workflows/**'
   pull_request:
+    branches: ["master", "dev", "feature-*"]
     paths:
-      - 'terraform/**'
-
+      - 'terraform/modules/**/*.tf'
+      - '.github/workflows/**'
+      
 permissions:
   contents: read
 
