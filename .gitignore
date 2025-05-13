@@ -1,3 +1,5 @@
+# Ignore Cursor IDE config and cache
+.cursor/
 # Terraform state files
 *.tfstate
 *.tfstate.*

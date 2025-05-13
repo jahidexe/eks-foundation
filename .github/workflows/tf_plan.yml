@@ -7,24 +7,36 @@ on:
       - 'terraform/modules/**/*.tf'
       - '.github/workflows/**'
   pull_request:
-    branches: [main, dev, 'feature-*']
+    branches: ["master", "dev", "feature-*"]
     paths:
       - 'terraform/modules/**/*.tf'
       - '.github/workflows/**'
 
 jobs:
   terraform:
-    name: Terraform Format, Validate, Lint, Plan
+    name: Terraform Static Analysis and Plan
     runs-on: ubuntu-latest
 
     defaults:
       run:
         shell: bash
-        working-directory: ./terraform/modules/test  # or 'eks', 'vpc' if needed
+        working-directory: ./terraform/modules/test  # Adjust as needed
 
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
+
+      - name: Run tfsec for static security analysis
+        uses: aquasecurity/tfsec-action@v1.0.0
+        with:
+          working_directory: ./terraform/modules/test
+          format: sarif
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Upload tfsec SARIF report
+        uses: github/codeql-action/upload-sarif@v1
+        with:
+          sarif_file: tfsec.sarif
 
       - name: Setup Terraform
         uses: hashicorp/setup-terraform@v3
