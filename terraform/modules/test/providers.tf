@@ -23,28 +23,14 @@ provider "aws" {
   }
 }
 
-# For the initial deployment, the Kubernetes provider is not required
-# After cluster creation, uncomment this and set manage_aws_auth = true in terraform.tfvars
-# 
-# provider "kubernetes" {
-#   host                   = data.aws_eks_cluster.this[0].endpoint
-#   cluster_ca_certificate = base64decode(data.aws_eks_cluster.this[0].certificate_authority[0].data)
-#   exec {
-#     api_version = "client.authentication.k8s.io/v1beta1"
-#     args        = ["eks", "get-token", "--cluster-name", var.cluster_name]
-#     command     = "aws"
-#   }
-# }
-# 
-# data "aws_eks_cluster" "this" {
-#   count = var.manage_aws_auth ? 1 : 0
-#   name  = var.cluster_name
-#   depends_on = [
-#     module.eks
-#   ]
-# }
+terraform {
+  backend "s3" {
+    bucket         = "myproject-dev-terraform-state"
+    key            = "terraform.tfstate"
+    region         = "eu-west-1"
+    dynamodb_table = "myproject-dev-terraform-locks"
+    encrypt        = true
+    kms_key_id     = "arn:aws:kms:eu-west-1:509399620336:key/99e51278-2f41-4b52-88f5-ef5db7d5fe94"
+  }
+}
 
-# Note: After the cluster is created, you can run:
-# 1. Set manage_aws_auth = true in terraform.tfvars
-# 2. Uncomment the provider "kubernetes" block above
-# 3. Run terraform apply again
