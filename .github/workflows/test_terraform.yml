@@ -3,7 +3,13 @@ name: Terraform
 on:
   push:
     branches: [ "master" ]
+    paths:
+      - 'terraform/**'
+      - '.github/workflows/test_terraform.yml'
   pull_request:
+    paths:
+      - 'terraform/**'
+      - '.github/workflows/test_terraform.yml'
 
 permissions:
   contents: read
@@ -13,11 +19,12 @@ jobs:
     name: 'Terraform'
     runs-on: ubuntu-latest
     environment: dev
-
-    # Use the Bash shell regardless whether the GitHub Actions runner is ubuntu-latest, macos-latest, or windows-latest
+    
     defaults:
       run:
         shell: bash
+        # Set the working directory for all run steps
+        working-directory: ./terraform
 
     steps:
     # Checkout the repository to the GitHub Actions runner
@@ -53,14 +60,18 @@ jobs:
 
     # Checks that all Terraform configuration files adhere to a canonical format
     - name: Terraform Format
-      run: terraform fmt -check
+      run: terraform fmt -check -recursive
+
+    # Validates Terraform configuration
+    - name: Terraform Validate
+      run: terraform validate
 
     # Generates an execution plan for Terraform
     - name: Terraform Plan
       run: terraform plan -input=false
-
-      # On push to "master", build or change infrastructure according to Terraform configuration files
-      # Note: It is recommended to set up a required "strict" status check in your repository for "Terraform Cloud". See the documentation on "strict" required status checks for more information: https://help.github.com/en/github/administering-a-repository/types-of-required-status-checks
+      
+    # On push to "master", build or change infrastructure according to Terraform configuration files
+    # Note: It is recommended to set up a required "strict" status check in your repository for "Terraform Cloud". See the documentation on "strict" required status checks for more information: https://help.github.com/en/github/administering-a-repository/types-of-required-status-checks
     - name: Terraform Apply
       if: github.ref == 'refs/heads/master' && github.event_name == 'push'
       run: terraform apply -auto-approve -input=false
