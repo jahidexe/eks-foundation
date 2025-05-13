@@ -37,7 +37,7 @@ jobs:
       with:
         aws-access-key-id: ${{ secrets.JAHID_GITHUB_CI_ACCESS_KEY_ID }}
         aws-secret-access-key: ${{ secrets.JAHID_GITHUB_CI_SECRET_KEY_ID }}
-        aws-region: us-east-1
+        aws-region: eu-west-1
 
     # Install the latest version of Terraform CLI and configure the Terraform CLI configuration file with a Terraform Cloud user API token
     - name: Setup Terraform
@@ -54,7 +54,7 @@ jobs:
         terraform init \
           -backend-config="bucket=${{ secrets.TF_STATE_BUCKET }}" \
           -backend-config="key=terraform.tfstate" \
-          -backend-config="region=us-east-1" \
+          -backend-config="region=eu-west-1" \
           -backend-config="dynamodb_table=${{ secrets.TF_LOCK_TABLE }}" \
           -backend-config="encrypt=true"
 
