@@ -1,7 +1,9 @@
-name: TFLint
+name: TFLint and Checkov
 
 permissions:
   contents: read # This is required for actions/checkout
+  security-events: write # for github/codeql-action/upload-sarif to upload SARIF results
+  actions: read # only required for a private repository by github/codeql-action/upload-sarif
 
 on:
   push:
@@ -14,6 +16,7 @@ on:
     paths:
       - 'terraform/modules/test/**/*.tf'
       - '.github/workflows/**'
+  workflow_dispatch:
 
 jobs:
   lint:
@@ -30,3 +33,21 @@ jobs:
         run: tflint --init
       - name: Run TFLint
         run: tflint
+        
+  security-scan:
+    name: Checkov Scan
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout source code
+        uses: actions/checkout@v4
+      - name: Run Checkov
+        uses: bridgecrewio/checkov-action@v12
+        with:
+          config_file: .checkov.yaml
+          
+      - name: Upload SARIF file
+        uses: github/codeql-action/upload-sarif@v3
+        # Results are generated only on a success or failure
+        if: success() || failure()
+        with:
+          sarif_file: results.sarif
