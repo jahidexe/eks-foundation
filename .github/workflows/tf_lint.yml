@@ -1,0 +1,32 @@
+name: TFLint
+
+permissions:
+  contents: read # This is required for actions/checkout
+
+on:
+  push:
+    branches: ["master"]
+    paths:
+      - 'terraform/modules/test/**/*.tf'
+      - '.github/workflows/**'
+  pull_request:
+    branches: ["master", "dev", "feature-*"]
+    paths:
+      - 'terraform/modules/test/**/*.tf'
+      - '.github/workflows/**'
+
+jobs:
+  lint:
+    name: TFLint Inspection
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout source code
+        uses: actions/checkout@v4
+      - name: Setup TFLint
+        uses: terraform-linters/setup-tflint@v4
+      - name: Show version
+        run: tflint --version
+      - name: Init TFLint
+        run: tflint --init
+      - name: Run TFLint
+        run: tflint
