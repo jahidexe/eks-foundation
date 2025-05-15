@@ -24,17 +24,19 @@ variable "environment" {
 
 # These variables are for the VPC module
 # In a real scenario, you would have a VPC module output these values
-variable "vpc_id" {
-  description = "VPC ID where EKS will be deployed"
-  type        = string
-  default     = "vpc-example" # This needs to be replaced with a real VPC ID
-}
+# Commented out because they're now provided by the VPC module output
+# but keeping for documentation purposes
+# variable "vpc_id" {
+#   description = "VPC ID where EKS will be deployed"
+#   type        = string
+#   default     = "vpc-example" # This needs to be replaced with a real VPC ID
+# }
 
-variable "subnet_ids" {
-  description = "Subnets for the EKS cluster (should be private subnets)"
-  type        = list(string)
-  default     = ["subnet-example1", "subnet-example2"] # These need to be replaced with real subnet IDs
-}
+# variable "subnet_ids" {
+#   description = "Subnets for the EKS cluster (should be private subnets)"
+#   type        = list(string)
+#   default     = ["subnet-example1", "subnet-example2"] # These need to be replaced with real subnet IDs
+# }
 
 variable "vpc_cidr" {
   description = "CIDR block of the VPC"
@@ -55,11 +57,12 @@ variable "endpoint_public_access" {
   default     = false # Disabled by default for security
 }
 
-variable "endpoint_private_access" {
-  description = "Whether the Amazon EKS private API server endpoint is enabled"
-  type        = bool
-  default     = true
-}
+# Variable is used in dev.tf with a hardcoded value, but keeping definition for clarity
+# variable "endpoint_private_access" {
+#   description = "Whether the Amazon EKS private API server endpoint is enabled"
+#   type        = bool
+#   default     = true
+# }
 
 variable "public_access_cidrs" {
   description = "List of CIDR blocks that can access the Amazon EKS public API server endpoint when public access is enabled"
@@ -228,20 +231,22 @@ variable "public_subnet_cidrs" {
 }
 
 # Add new variables for encryption and security
-variable "kms_key_arn" {
-  description = "ARN of the KMS key used for encrypting EKS secrets"
-  type        = string
-  default     = null # Will create a new KMS key if not specified
-}
+# Commented out because they're provided through other mechanisms
+# but keeping for documentation purposes
+# variable "kms_key_arn" {
+#   description = "ARN of the KMS key used for encrypting EKS secrets"
+#   type        = string
+#   default     = null # Will create a new KMS key if not specified
+# }
 
-variable "flow_logs_retention_in_days" {
-  description = "Number of days to retain VPC flow logs"
-  type        = number
-  default     = 14
-}
+# variable "flow_logs_retention_in_days" {
+#   description = "Number of days to retain VPC flow logs"
+#   type        = number
+#   default     = 14
+# }
 
-variable "flow_logs_traffic_type" {
-  description = "Type of traffic to capture in VPC flow logs (ACCEPT, REJECT, or ALL)"
-  type        = string
-  default     = "ALL"
-}
+# variable "flow_logs_traffic_type" {
+#   description = "Type of traffic to capture in VPC flow logs (ACCEPT, REJECT, or ALL)"
+#   type        = string
+#   default     = "ALL"
+# }
