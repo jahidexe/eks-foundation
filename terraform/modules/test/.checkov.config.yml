@@ -1,0 +1,11 @@
+# Checkov configuration
+output: sarif
+directory: 
+  - terraform/modules/test
+download-external-modules: true
+framework: terraform
+compact: true
+quiet: false
+skip-check:
+  - CKV_AWS_115  # Example of check to skip - remove if not needed
+  - CKV_AWS_116  # Example of check to skip - remove if not needed 

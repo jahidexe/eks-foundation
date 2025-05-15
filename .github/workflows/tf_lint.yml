@@ -45,13 +45,14 @@ jobs:
       - name: Checkout source code
         uses: actions/checkout@v4
       - name: Run Checkov
+        id: checkov
         uses: bridgecrewio/checkov-action@v12
         with:
           directory: ./terraform/modules/test
-          config_file: .checkov.config.yml
           soft_fail: true  # Won't fail the build if checks don't pass
           framework: terraform
           output_format: sarif
+          output_file_path: results.sarif
           download_external_modules: true
       - name: Upload SARIF file
         uses: github/codeql-action/upload-sarif@v3
