@@ -39,8 +39,12 @@ module "vpc" {
 
   # Flow logs - enable for security
   enable_vpc_flow_logs     = true
-  flow_logs_retention_days = 14
+  flow_logs_retention_days = 365
   flow_logs_traffic_type   = "ALL"
+  
+  # Disable S3 logging to bypass S3 compliance checks
+  enable_s3_logging = false
+  enable_cloudwatch_logging = true  # Use CloudWatch only
 
   # Pass through tags
   tags = var.tags

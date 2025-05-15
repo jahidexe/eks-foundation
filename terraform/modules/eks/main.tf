@@ -81,7 +81,7 @@ resource "aws_autoscaling_schedule" "scale_up" {
 # CloudWatch Log Group for EKS cluster logs
 resource "aws_cloudwatch_log_group" "eks_cluster" {
   name              = "/aws/eks/${var.cluster_name}/cluster"
-  retention_in_days = var.environment == "prod" ? 90 : var.environment == "dev" ? 14 : 30
+  retention_in_days = var.environment == "prod" ? 730 : 365
   kms_key_id        = aws_kms_key.eks.arn
 
   tags = merge(local.common_tags, {

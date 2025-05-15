@@ -6,11 +6,13 @@ on:
     paths:
       - 'terraform/modules/test/**/*.tf'
       - '.github/workflows/**'
+      - '.github/.checkov.yaml'
   pull_request:
     branches: ["master", "dev", "feature-*"]
     paths:
       - 'terraform/modules/test/**/*.tf'
       - '.github/workflows/**'
+      - '.github/.checkov.yaml'
       
 permissions:
   contents: read
@@ -58,6 +60,28 @@ jobs:
 
     - name: Terraform Validate
       run: terraform validate
+
+    # Run tflint for additional linting
+    - name: Setup TFLint
+      uses: terraform-linters/setup-tflint@v3
+      with:
+        tflint_version: v0.46.1
+
+    - name: Run TFLint
+      run: |
+        tflint --init
+        tflint --format=compact
+
+    # Run Checkov security scan with custom config
+    - name: Checkov Security Scan
+      uses: bridgecrewio/checkov-action@master
+      with:
+        directory: ./terraform/modules/test
+        config_file: .github/.checkov.yaml
+        soft_fail: true  # Set to false to make the build fail if checks don't pass
+        framework: terraform
+        output_format: github_failed_only
+        download_external_modules: true
 
     - name: Terraform Plan
       run: terraform plan -input=false

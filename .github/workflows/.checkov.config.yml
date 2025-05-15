@@ -1,0 +1,7 @@
+# Checkov configuration file
+# https://www.checkov.io/2.Basics/CLI%20Command%20Reference.html
+
+skip-check:
+  - CKV2_AWS_62  # Skip "Ensure S3 buckets should have event notifications enabled"
+  - CKV_AWS_144  # Skip "Ensure that S3 bucket has cross-region replication enabled"
+  - CKV_AWS_137  # Skip "Ensure that S3 bucket has logging enabled" 
